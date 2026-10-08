@@ -81,20 +81,20 @@ function AuthPage() {
             </p>
           </form>
         ) : (
-          <form onSubmit={submitCode} className="space-y-4">
-            <h1 className="text-5xl">Enter code</h1>
-            <p className="text-sm text-muted-foreground">Sent to <span className="text-foreground">{email}</span>. Valid for 10 minutes. Check spam too.</p>
-            <Input inputMode="numeric" autoComplete="one-time-code" maxLength={8} placeholder="123456" className="text-center text-2xl tracking-[0.5em]"
-              value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} autoFocus />
+          <div className="space-y-4">
+            <h1 className="text-5xl">Check your email</h1>
+            <p className="text-sm text-muted-foreground">
+              We sent a sign-in link to <span className="text-foreground">{email}</span>.
+              Open the email and click the link to continue — it signs you in automatically. Check spam too.
+            </p>
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={busy || code.length < 6}>{busy ? "Checking…" : "Verify & continue"}</Button>
             <div className="flex justify-between text-sm">
               <button type="button" className="text-muted-foreground underline" onClick={() => { setStep("email"); setError(""); }}>Change email</button>
               <button type="button" className="text-primary underline disabled:no-underline disabled:text-muted-foreground" disabled={wait > 0 || busy} onClick={() => sendCode()}>
-                {wait > 0 ? `Resend in ${wait}s` : "Resend code"}
+                {wait > 0 ? `Resend in ${wait}s` : "Resend email"}
               </button>
             </div>
-          </form>
+          </div>
         )}
       </div>
     </main>
