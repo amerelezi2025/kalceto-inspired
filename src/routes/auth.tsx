@@ -12,9 +12,9 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign up or log in — Kalceto Finder" },
-      { name: "description", content: "Get a 6-digit code by email to sign in to Kalceto Finder." },
+      { name: "description", content: "Get a sign-in link by email to enter Kalceto Finder." },
       { property: "og:title", content: "Sign in — Kalceto Finder" },
-      { property: "og:description", content: "Get a 6-digit code by email to sign in." },
+      { property: "og:description", content: "Get a sign-in link by email to enter Kalceto Finder." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -69,10 +69,10 @@ function AuthPage() {
         {step === "email" ? (
           <form onSubmit={sendCode} className="space-y-4">
             <h1 className="text-5xl">{mode === "signup" ? "Create account" : "Log in"}</h1>
-            <p className="text-sm text-muted-foreground">We'll email you a 6-digit code. No password needed.</p>
+            <p className="text-sm text-muted-foreground">We'll email you a sign-in link. No password needed.</p>
             <Input type="email" required placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={busy || wait > 0}>{busy ? "Sending…" : wait > 0 ? `Wait ${wait}s` : "Send code"}</Button>
+            <Button type="submit" className="w-full" disabled={busy || wait > 0}>{busy ? "Sending…" : wait > 0 ? `Wait ${wait}s` : "Email me a link"}</Button>
             <p className="text-center text-sm text-muted-foreground">
               {mode === "signup" ? "Already have an account? " : "New here? "}
               <button type="button" className="text-primary underline" onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setError(""); }}>
