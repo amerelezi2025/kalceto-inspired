@@ -48,16 +48,7 @@ function AuthPage() {
     const r = await send({ data: { email, mode } }).catch(() => ({ ok: false as const, error: "Something went wrong. Try again." }));
     setBusy(false);
     if (!r.ok) { setError(r.error); if ("wait" in r && r.wait) setWait(r.wait); return; }
-    setStep("code"); setCode(""); setWait(60);
-  }
-
-  async function submitCode(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true); setError("");
-    const r = await verify({ data: { email, code } }).catch(() => ({ ok: false as const, error: "Something went wrong. Try again." }));
-    if (!r.ok) { setBusy(false); setError(r.error); return; }
-    await supabase.auth.setSession({ access_token: r.access_token, refresh_token: r.refresh_token });
-    navigate({ to: "/dashboard" });
+    setStep("sent"); setWait(60);
   }
 
   return (
