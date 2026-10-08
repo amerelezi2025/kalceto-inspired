@@ -14,7 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      otp_requests: {
+        Row: {
+          created_at: string
+          email: string
+          failed_attempts: number
+          id: string
+          ip: string | null
+          used: boolean
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          failed_attempts?: number
+          id?: string
+          ip?: string | null
+          used?: boolean
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          failed_attempts?: number
+          id?: string
+          ip?: string | null
+          used?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
