@@ -44,11 +44,32 @@ function AuthPage() {
 
   async function sendCode(e?: React.FormEvent) {
     e?.preventDefault();
+    if (method === "password" && step === "email") return passwordSubmit();
     setBusy(true); setError("");
     const r = await send({ data: { email, mode } }).catch(() => ({ ok: false as const, error: "Something went wrong. Try again." }));
     setBusy(false);
     if (!r.ok) { setError(r.error); if ("wait" in r && r.wait) setWait(r.wait); return; }
     setStep("sent"); setWait(60);
+  }
+
+  async function passwordSubmit() {
+    setError("");
+    if (mode === "signup") {
+      if (!isStrongPassword(password)) return setError("Your password isn't strong enough yet.");
+      if (password !== confirm) return setError("The two passwords don't match.");
+      setBusy(true);
+      const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + "/dashboard" } });
+      setBusy(false);
+      if (error) return setError(/pwned|leaked|weak/i.test(error.message) ? "This password has appeared in a data leak. Pick a different one." : error.message);
+      if (data.session) return navigate({ to: "/dashboard" });
+      setStep("sent"); setWait(60);
+    } else {
+      setBusy(true);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setBusy(false);
+      if (error) return setError(/confirm/i.test(error.message) ? "Please confirm your email first — check your inbox." : "Wrong email or password.");
+      navigate({ to: "/dashboard" });
+    }
   }
 
   return (
@@ -58,10 +79,39 @@ function AuthPage() {
         {step === "email" ? (
           <form onSubmit={sendCode} className="space-y-4">
             <h1 className="text-5xl">{mode === "signup" ? "Create account" : "Log in"}</h1>
-            <p className="text-sm text-muted-foreground">We'll email you a sign-in link. No password needed.</p>
+            <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 text-sm">
+              {(["password", "link"] as const).map((m) => (
+                <button key={m} type="button" onClick={() => { setMethod(m); setError(""); }}
+                  className={`rounded-md py-1.5 ${method === m ? "bg-background text-foreground" : "text-muted-foreground"}`}>
+                  {m === "password" ? "With password" : "Email link"}
+                </button>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {method === "link" ? "We'll email you a sign-in link. No password needed." : mode === "signup" ? "Choose a strong password. We'll email you once to confirm your address." : "Log in with your email and password."}
+            </p>
             <Input type="email" required placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
+            {method === "password" && (
+              <>
+                <Input type="password" required placeholder="Password" autoComplete={mode === "signup" ? "new-password" : "current-password"} value={password} onChange={(e) => setPassword(e.target.value)} />
+                {mode === "signup" && (
+                  <>
+                    <ul className="space-y-1 text-xs">
+                      {passwordChecks.map((c) => (
+                        <li key={c.label} className={c.test(password) ? "text-primary" : "text-muted-foreground"}>
+                          {c.test(password) ? "✓" : "•"} {c.label}
+                        </li>
+                      ))}
+                    </ul>
+                    <Input type="password" required placeholder="Repeat password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+                  </>
+                )}
+              </>
+            )}
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={busy || wait > 0}>{busy ? "Sending…" : wait > 0 ? `Wait ${wait}s` : "Email me a link"}</Button>
+            <Button type="submit" className="w-full" disabled={busy || (method === "link" && wait > 0)}>
+              {busy ? "Please wait…" : method === "password" ? (mode === "signup" ? "Create account" : "Log in") : wait > 0 ? `Wait ${wait}s` : "Email me a link"}
+            </Button>
             <p className="text-center text-sm text-muted-foreground">
               {mode === "signup" ? "Already have an account? " : "New here? "}
               <button type="button" className="text-primary underline" onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setError(""); }}>
