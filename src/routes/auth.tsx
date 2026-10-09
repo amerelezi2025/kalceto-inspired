@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { requestCode } from "@/lib/auth.functions";
+import { isStrongPassword, passwordChecks } from "@/lib/password-rules";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: z.object({ mode: z.enum(["signup", "login"]).optional() }),
@@ -28,6 +29,9 @@ function AuthPage() {
   const [mode, setMode] = useState<"signup" | "login">(search.mode ?? "login");
   const [step, setStep] = useState<"email" | "sent">("email");
   const [email, setEmail] = useState("");
+  const [method, setMethod] = useState<"password" | "link">("password");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [wait, setWait] = useState(0);
