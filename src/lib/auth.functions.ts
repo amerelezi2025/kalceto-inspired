@@ -69,7 +69,7 @@ export const requestCode = createServerFn({ method: "POST" })
 
     const { error } = await publicClient().auth.signInWithOtp({
       email,
-      options: { shouldCreateUser: data.mode === "signup", emailRedirectTo },
+      options: { shouldCreateUser: data.mode === "signup", ...(emailRedirectTo ? { emailRedirectTo } : {}) },
     });
     if (error) {
       console.error("signInWithOtp", error.message);
