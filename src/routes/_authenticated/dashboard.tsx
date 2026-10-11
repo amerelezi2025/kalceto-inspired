@@ -1,9 +1,13 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  // Accounts must choose a password before entering.
+  beforeLoad: ({ context }) => {
+    if (!context.user.user_metadata?.["has_password"]) throw redirect({ to: "/set-password" });
+  },
   head: () => ({ meta: [{ title: "My account — Kalceto Finder" }, { name: "robots", content: "noindex" }] }),
   component: Dashboard,
 });

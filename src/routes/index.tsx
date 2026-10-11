@@ -1,5 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,6 +18,11 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const navigate = useNavigate();
+  // If someone lands here from an email link, send them on into the site.
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => data.user && navigate({ to: "/dashboard" }));
+  }, [navigate]);
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-6">
       <p className="text-sm uppercase tracking-[0.3em] text-accent">Shkodër · Albania</p>
