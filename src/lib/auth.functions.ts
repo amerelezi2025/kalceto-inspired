@@ -59,8 +59,8 @@ export const requestCode = createServerFn({ method: "POST" })
       ipSendsLastHour: ipCount.count ?? 0,
       now,
     });
-    if (block?.code === "cooldown") return { ok: false, error: `Please wait ${block.wait}s before asking for a new code.`, wait: block.wait };
-    if (block) return { ok: false, error: "Too many code requests. Please try again in an hour." };
+    if (block?.code === "cooldown") return { ok: false, error: `Please wait ${block.wait}s before asking for a new email.`, wait: block.wait };
+    if (block) return { ok: false, error: "Too many emails requested. Please try again in an hour." };
 
     // Send the user back to this same site: new accounts go straight to "choose a password".
     const origin = getRequestHeader("origin");
@@ -76,7 +76,7 @@ export const requestCode = createServerFn({ method: "POST" })
       if (/signups not allowed|not found/i.test(error.message))
         return { ok: false, error: "No account with this email yet. Please sign up first." };
       if (error.status === 429) return { ok: false, error: "Too many emails sent right now. Please try again later." };
-      return { ok: false, error: "We couldn't send the code. Please try again." };
+      return { ok: false, error: "We couldn't send the email. Please try again." };
     }
     await supabaseAdmin.from("otp_requests").insert({ email, ip });
     return { ok: true };
