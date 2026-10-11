@@ -62,9 +62,14 @@ export const requestCode = createServerFn({ method: "POST" })
     if (block?.code === "cooldown") return { ok: false, error: `Please wait ${block.wait}s before asking for a new code.`, wait: block.wait };
     if (block) return { ok: false, error: "Too many code requests. Please try again in an hour." };
 
+    // Send the user back to this same site: new accounts go straight to "choose a password".
+    const origin = getRequestHeader("origin");
+    const safeOrigin = origin && /^https?:\/\/[^/]+$/.test(origin) ? origin : undefined;
+    const emailRedirectTo = safeOrigin ? `${safeOrigin}${data.mode === "signup" ? "/set-password" : "/dashboard"}` : undefined;
+
     const { error } = await publicClient().auth.signInWithOtp({
       email,
-      options: { shouldCreateUser: data.mode === "signup" },
+      options: { shouldCreateUser: data.mode === "signup", emailRedirectTo },
     });
     if (error) {
       console.error("signInWithOtp", error.message);
