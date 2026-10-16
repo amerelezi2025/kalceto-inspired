@@ -13,13 +13,13 @@ Continue developing this project in the [Lovable editor](https://lovable.dev/pro
 - **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
+amer elezi
 
 Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
 git clone <this-repository-url>
-cd <repository-name>
-npm i
+cd <repository-name
 npm run dev
 ```
 sync test 1
